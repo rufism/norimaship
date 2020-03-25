@@ -1,9 +1,9 @@
-const logger = require('koa-logger');
 const router = require('koa-router')();
+const logger = require('koa-logger');
 const koaBody = require('koa-body');
 const views = require('koa-views');
+const uuid = require('uuid/v4');
 const path = require('path');
-const uuid = require('uuid/v4')
 
 const Koa = require('koa');
 const app = new Koa();
@@ -13,19 +13,27 @@ const datastore = {};
 
 app.use(logger());
 
-app.use(views(path.join(__dirname, '/views')));
+app.use(views(path.join(__dirname, '/views'), { extension: 'ejs' }));
 
 app.use(koaBody());
 
+router.get('/', async (ctx) => {
+    await ctx.render('home');
+});
+
+router.get('/game/:id', async (ctx) => {
+    await ctx.render('game', { id: ctx.params.id, game: datastore[ctx.params.id] });
+});
+
 // Games
 router.get('/heartbeat', heartbeat)
-    .post('/game', createGame)
-    .get('/game/:id', getGame)
-    .post('/game/:id/start', startGame)
-    .get('/game/:id/player/:pid/pieces', getPlayerPieces)
-    .post('/game/:id/player/:pid/pieces', setPlayerPieces)
-    .get('/game/:id/shots', getGameShots)
-    .post('/game/:id/shot', createGameShot);
+router.post('/game', createGame)
+router.get('/game/:id', getGame)
+router.post('/game/:id/start', startGame)
+router.get('/game/:id/player/:pid/pieces', getPlayerPieces)
+router.post('/game/:id/player/:pid/pieces', setPlayerPieces)
+router.get('/game/:id/shots', getGameShots)
+router.post('/game/:id/shot', createGameShot);
 
 app.use(router.routes());
 
