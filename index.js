@@ -1,6 +1,7 @@
 const router = require('koa-router')();
 const logger = require('koa-logger');
 const koaBody = require('koa-body');
+const serve = require('koa-static');
 const views = require('koa-views');
 const uuid = require('uuid/v4');
 const path = require('path');
@@ -16,6 +17,9 @@ app.use(logger());
 app.use(views(path.join(__dirname, '/views'), { extension: 'ejs' }));
 
 app.use(koaBody());
+
+// Serve static files
+app.use(serve(path.join(__dirname, 'public')));
 
 router.get('/', async (ctx) => {
     await ctx.render('home');
